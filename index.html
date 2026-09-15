@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cameron Souza</title>
+<meta property="og:title" content="Cameron Souza">
+<meta property="og:description" content="Element cycles in bounded systems, from the Hawaiian Islands to sealed habitats.">
+<meta property="og:image" content="assets/img/hero.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%2304090d'/%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%23eef1f2' stroke-width='1.6' stroke-dasharray='3 2.4'/%3E%3Ccircle cx='16' cy='16' r='3.2' fill='%23ea5aa4'/%3E%3C/svg%3E">
+<meta name="description" content="Cameron Souza models carbon, nitrogen and phosphorus cycles in bounded systems, from the Hawaiian Islands to sealed habitats. PhD student in Environmental Sciences at Oregon State University.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,200;0,300;0,400;1,200;1,300&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --void:#04090d; --abyss:#07131b; --deep:#0b1f2c; --line:rgba(200,220,228,.16);
+  --foam:#eef1f2; --soft:#c9d4d8; --mist:#93a3aa; --magenta:#ea5aa4;
+  --serif:"Spectral",Georgia,"Times New Roman",serif;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --gutter:clamp(16px,4vw,56px);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{background:var(--void)}
+body{margin:0;background:var(--void);color:var(--foam);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--magenta);outline-offset:3px}
+h1,h2,h3{font-family:var(--serif);font-weight:300;margin:0;text-wrap:balance}
+p{margin:0}
+.mono{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;color:var(--mist)}
+.wrap{max-width:1180px;margin-inline:auto;padding-inline:var(--gutter)}
+
+/* ---------- nav ---------- */
+.nav{position:fixed;inset:0 0 auto 0;z-index:30;padding-top:env(safe-area-inset-top,0px);transition:background .4s,border-color .4s;border-bottom:1px solid transparent}
+.nav.solidnav{background:rgba(4,9,13,.86);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-color:var(--line)}
+.nav .bar{display:flex;justify-content:space-between;align-items:center;height:64px;padding-inline:var(--gutter)}
+.nav a{text-decoration:none}
+.nav .me{font-family:var(--serif);font-size:1.1rem;display:flex;gap:10px;align-items:center}
+.nav .me i{width:9px;height:9px;border-radius:50%;background:var(--magenta);display:inline-block}
+.nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0}
+.nav ul a{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.nav ul a:hover{color:var(--foam)}
+@media (max-width:720px){.nav ul li:not(.keep){display:none}}
+
+/* ---------- fixed stage ---------- */
+.stage{position:fixed;inset:0;z-index:0;overflow:hidden;background:var(--void)}
+.scene{position:absolute;inset:-3%;background-size:cover;background-position:center;opacity:0;transform:scale(1.08);
+  transition:opacity 1.4s ease,transform 9s ease-out}
+.scene.on{opacity:1;transform:scale(1)}
+.scene.dim{filter:brightness(.55) saturate(.75)}
+.stage::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(4,9,13,.94) 0%,rgba(4,9,13,.78) 34%,rgba(4,9,13,.2) 68%,rgba(4,9,13,.35) 100%),
+  linear-gradient(180deg,rgba(4,9,13,.55) 0%,transparent 22%,transparent 70%,rgba(4,9,13,.8) 100%)}
+@media (max-width:820px){.stage::after{background:linear-gradient(180deg,rgba(4,9,13,.7),rgba(4,9,13,.55) 40%,rgba(4,9,13,.85))}}
+#ring{position:absolute;inset:0;width:100%;height:100%;z-index:2}
+.hud{position:absolute;z-index:3;right:var(--gutter);bottom:calc(28px + env(safe-area-inset-bottom,0px));width:min(340px,calc(100% - 2*var(--gutter)));
+  border:1px solid var(--line);background:rgba(4,9,13,.55);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:14px 16px;display:grid;gap:8px}
+.hud .row{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.hud b{font-family:var(--mono);font-weight:500;font-size:.8rem;letter-spacing:.06em;color:var(--foam)}
+.meter{height:6px;background:rgba(200,220,228,.12);position:relative;overflow:hidden}
+.meter span{position:absolute;inset:0 auto 0 0;width:80%;background:var(--magenta);transition:width 1.2s cubic-bezier(.2,.7,.2,1)}
+.hud .ticks{display:flex;justify-content:space-between}
+.hud .ticks span{font-family:var(--mono);font-size:.6rem;color:var(--mist);letter-spacing:.1em;text-transform:uppercase}
+.hud .credit{font-family:var(--mono);font-size:.6rem;color:var(--mist);letter-spacing:.06em;border-top:1px solid var(--line);padding-top:8px}
+.hud.off{opacity:0;pointer-events:none}
+.hud{transition:opacity .5s}
+@media (max-width:820px){.hud{left:var(--gutter);right:auto;bottom:calc(14px + env(safe-area-inset-bottom,0px));padding:10px 12px}.hud .ticks{display:none}}
+
+/* ---------- journey ---------- */
+.journey{position:relative;z-index:5}
+.ch{min-height:100svh;display:flex;align-items:center;padding-block:96px}
+.ch .card{max-width:34rem;display:grid;gap:18px}
+.ch .idx{font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;color:var(--magenta)}
+.ch h2,.ch p,.open h1,.open .lead{text-shadow:0 2px 20px rgba(4,9,13,.7)}
+.ch h2{font-size:clamp(2.2rem,5vw,3.8rem);line-height:1.02;letter-spacing:-.015em}
+.ch p{font-size:1.12rem;color:var(--soft);max-width:48ch}
+.ch p b{color:var(--foam);font-weight:500}
+@media (max-width:820px){.ch{align-items:flex-start;padding-top:18svh}}
+
+.open h1{font-size:clamp(3.6rem,11vw,9.5rem);line-height:.9;font-weight:200;letter-spacing:-.035em}
+.open .lead{font-family:var(--serif);font-size:clamp(1.5rem,3.2vw,2.35rem);line-height:1.2;font-weight:300;color:var(--foam);max-width:24ch;margin-top:28px}
+.open .lead em{font-style:italic;color:#f4a3cb}
+.open .who{margin-top:26px;display:flex;flex-wrap:wrap;gap:8px 22px}
+.open .who span{font-family:var(--mono);font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft)}
+.scroll-cue{margin-top:44px;display:flex;align-items:center;gap:12px}
+.scroll-cue i{width:1px;height:42px;background:linear-gradient(var(--magenta),transparent);display:block;animation:cue 2.4s ease-in-out infinite}
+@keyframes cue{0%{transform:scaleY(.2);transform-origin:top}50%{transform:scaleY(1);transform-origin:top}100%{transform:scaleY(.2);transform-origin:bottom}}
+.load{animation:rise 1.2s cubic-bezier(.2,.7,.2,1) both}
+.d1{animation-delay:.15s}.d2{animation-delay:.35s}.d3{animation-delay:.55s}
+@keyframes rise{from{transform:translateY(22px);opacity:.001}to{transform:none;opacity:1}}
+
+/* ---------- solid sections ---------- */
+.solid{position:relative;z-index:6;background:var(--abyss)}
+.solid section{padding-block:clamp(72px,10vw,128px);border-top:1px solid var(--line)}
+.solid h2{font-size:clamp(2rem,4.4vw,3.3rem);line-height:1.05;letter-spacing:-.01em}
+.two{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:clamp(24px,5vw,80px)}
+@media (max-width:860px){.two{grid-template-columns:1fr}}
+.prose{display:grid;gap:16px;color:var(--soft);font-size:1.06rem;max-width:62ch}
+.pivot{background:radial-gradient(80% 120% at 85% 0%,#1a1030 0%,var(--abyss) 55%)}
+.pivot .big{font-family:var(--serif);font-weight:200;font-size:clamp(2.4rem,6vw,5rem);line-height:1;letter-spacing:-.02em;max-width:16ch}
+.pivot .big em{font-style:italic;color:var(--magenta)}
+.formula{margin-top:clamp(40px,6vw,64px);font-family:var(--serif);font-size:clamp(1.4rem,3.4vw,2.6rem);font-weight:200;overflow-x:auto;white-space:nowrap;padding-bottom:6px;border-block:1px solid var(--line);padding-block:22px}
+.formula sub{font-size:.5em}
+.formula .m{color:var(--magenta)}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;margin-top:22px}
+@media (max-width:720px){.legend{grid-template-columns:1fr}}
+.legend p{font-size:.94rem;color:var(--soft)}
+.legend b{display:block;font-family:var(--mono);font-weight:500;font-size:.78rem;letter-spacing:.1em;color:var(--foam);margin-bottom:4px}
+.phases{list-style:none;margin:clamp(40px,6vw,64px) 0 0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line)}
+@media (max-width:900px){.phases{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.phases{grid-template-columns:1fr}}
+.phases li{padding:22px 20px 24px 0;display:grid;gap:8px;align-content:start;border-bottom:1px solid var(--line)}
+.phases .n{font-family:var(--mono);font-size:.7rem;letter-spacing:.14em;color:var(--magenta)}
+.phases h3{font-size:1.3rem}
+.phases p{font-size:.93rem;color:var(--soft);max-width:30ch}
+
+.now{list-style:none;margin:0;padding:0;display:grid;gap:0;border-top:1px solid var(--line)}
+.now li{display:grid;grid-template-columns:120px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+@media (max-width:480px){.now li{grid-template-columns:1fr;gap:4px}}
+.now b{font-weight:500}
+.now p{color:var(--soft);font-size:.95rem}
+.list{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.list li{display:grid;grid-template-columns:130px minmax(0,1fr);gap:20px;padding:18px 0;border-bottom:1px solid var(--line)}
+@media (max-width:480px){.list li{grid-template-columns:1fr;gap:6px}}
+.list .t{font-family:var(--serif);font-size:1.15rem;line-height:1.35}
+.list .s{font-size:.85rem;color:var(--mist);margin-top:4px}
+.tag{display:inline-block;font-family:var(--mono);font-size:.6rem;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border:1px solid var(--line);color:var(--mist)}
+.tag.hot{color:var(--magenta);border-color:rgba(234,90,164,.5)}
+.tag.in{color:var(--foam);border-color:rgba(238,241,242,.45)}
+
+.path{list-style:none;margin:28px 0 0;padding:0;border-left:1px solid var(--line)}
+.path li{position:relative;padding:0 0 22px 24px}
+.path li::before{content:"";position:absolute;left:-5px;top:8px;width:9px;height:9px;border-radius:50%;background:var(--abyss);border:1px solid var(--mist)}
+.path li.on::before{background:var(--magenta);border-color:var(--magenta)}
+.path time{font-family:var(--mono);font-size:.72rem;color:var(--mist);letter-spacing:.08em}
+.path b{display:block;font-weight:500}
+.path p{color:var(--soft);font-size:.93rem}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px}
+.facts span{font-size:.86rem;border:1px solid var(--line);padding:6px 12px}
+
+.places{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:clamp(32px,5vw,48px)}
+@media (max-width:820px){.places{grid-template-columns:1fr}}
+.places figure{margin:0;position:relative;aspect-ratio:4/3;max-width:100%;overflow:hidden}
+.places img{width:100%;height:100%;object-fit:cover;transition:transform 1.4s cubic-bezier(.2,.7,.2,1)}
+.places figure:hover img{transform:scale(1.05)}
+.places figcaption{position:absolute;inset:auto 0 0 0;padding:40px 16px 14px;background:linear-gradient(0deg,rgba(4,9,13,.92),transparent)}
+.places figcaption b{font-family:var(--serif);font-weight:400;font-size:1.3rem;display:block}
+.places figcaption span{font-size:.84rem;color:var(--soft)}
+
+.contact .big{font-family:var(--serif);font-weight:200;font-size:clamp(2.4rem,6vw,5rem);line-height:1;letter-spacing:-.02em}
+.mail{display:inline-block;margin-top:26px;font-family:var(--serif);font-size:clamp(1.3rem,3vw,2.1rem);text-decoration:none;border-bottom:1px solid var(--magenta);padding-bottom:4px;word-break:break-all}
+.mail:hover{color:var(--magenta)}
+.links{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.links a{font-family:var(--mono);font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border:1px solid var(--line);padding:10px 14px}
+.links a:hover{border-color:var(--magenta)}
+footer{position:relative;z-index:6;background:var(--void);border-top:1px solid var(--line);padding-block:28px 40px}
+footer p{font-size:.74rem;color:var(--mist);max-width:96ch;margin-top:10px}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .scene{transform:none}
+}
+</style>
+
+</head>
+<body>
+<nav class="nav" id="nav" aria-label="Primary">
+  <div class="bar">
+    <a class="me" href="#top"><i aria-hidden="true"></i>Cameron Souza</a>
+    <ul>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#now">Now</a></li>
+      <li><a href="#me">About</a></li>
+      <li class="keep"><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<div class="stage" aria-hidden="true">
+  <div class="scene on" data-scene="0" style="background-image:url('assets/img/hero.jpg')"></div>
+  <div class="scene" data-scene="1" style="background-image:url('assets/img/bloom.jpg')"></div>
+  <div class="scene" data-scene="2" style="background-image:url('assets/img/big-island.jpg')"></div>
+  <div class="scene" data-scene="3" style="background-image:url('assets/img/reef.jpg')"></div>
+  <div class="scene" data-scene="4" style="background-image:url('assets/img/archipelago.jpg')"></div>
+  <div class="scene dim" data-scene="5" style="background-image:url('assets/img/veggie.jpg')"></div>
+  <div class="scene" data-scene="6" style="background-image:url('assets/img/earthset.jpg')"></div>
+  <canvas id="ring"></canvas>
+  <div class="hud" id="hud">
+    <div class="row"><span class="mono">Boundary exchange</span><b id="hudVal">High</b></div>
+    <div class="meter"><span id="hudBar"></span></div>
+    <div class="ticks"><span>Sealed</span><span>Open</span></div>
+    <div class="credit" id="hudCredit">Hawaiian Islands · STS-51G · 1985 · NASA</div>
+  </div>
+</div>
+
+<main>
+<div class="journey" id="top">
+  <section class="ch open" data-k="0.85" data-val="Open" data-credit="Hawaiian Islands · STS-51G · 1985 · NASA" data-scene="0">
+    <div class="wrap card">
+      <p class="mono load">Earth system science · Biogeochemistry · Oregon State University</p>
+      <h1 class="load d1">Cameron<br>Souza</h1>
+      <p class="lead load d2">Life on Earth runs on a few element cycles. <em>I model how they work inside bounded systems, from islands to sealed habitats.</em></p>
+      <div class="who load d3"><span>PhD student</span><span>Environmental data scientist</span><span>USCG licensed captain</span></div>
+      <div class="scroll-cue load d3"><i aria-hidden="true"></i><span class="mono">Scroll from open ocean to a closed loop</span></div>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.95" data-val="Open ocean" data-credit="North Atlantic phytoplankton bloom · MODIS · 2013 · NASA" data-scene="1">
+    <div class="wrap card">
+      <span class="idx">01 · Ocean</span>
+      <h2>Half of Earth's photosynthesis floats.</h2>
+      <p>Marine phytoplankton carry out roughly half of global net primary production. Where nutrients reach the sunlit surface, blooms grow large enough to see from orbit. <b>Carbon, nitrogen and phosphorus set the pace.</b></p>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.8" data-val="High" data-credit="Hawaiʻi Island · ISS Expedition 72 · 2024 · NASA" data-scene="2">
+    <div class="wrap card">
+      <span class="idx">02 · Island</span>
+      <h2>An island runs on what crosses its coast.</h2>
+      <p>Hawaiʻi sits in the nutrient-poor middle of the North Pacific. Groundwater, streams, upwelling and dust carry nutrients across the shoreline, and the reef community lives on that supply. <b>This is my study system.</b></p>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.45" data-val="Moderate" data-credit="Society Islands reefs · STS-93 · 1999 · NASA" data-scene="3">
+    <div class="wrap card">
+      <span class="idx">03 · Reef</span>
+      <h2>Reefs hold on to more of what arrives.</h2>
+      <p>A ring of coral slows the water. Nutrients stay longer, and the community recycles a larger share of its own supply. The boundary is still open, but narrower.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.35" data-val="Set by chemistry" data-credit="Hawaiian Islands · STS-26 · 1988 · NASA" data-scene="4">
+    <div class="wrap card">
+      <span class="idx">04 · Stoichiometry</span>
+      <h2>Life keeps a ratio.</h2>
+      <p>Marine plankton average about 106 carbon to 16 nitrogen to 1 phosphorus, the Redfield ratio. In a bounded system, the element that runs short first limits everything else. <b>Measuring those ratios tells you where the boundary matters.</b></p>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.1" data-val="Low, resupplied" data-credit="Veggie PONDS · ISS Expedition 62 · 2020 · NASA" data-scene="5">
+    <div class="wrap card">
+      <span class="idx">05 · Closed loop</span>
+      <h2>The same chemistry, sealed.</h2>
+      <p>NASA has grown crops in closed chambers at Kennedy Space Center and now on the International Space Station. A crewed habitat is a bounded system with almost no exchange. The element cycles still have to balance.</p>
+    </div>
+  </section>
+
+  <section class="ch" data-k="0.0" data-val="Closed to matter" data-credit="Earthset · Artemis II · April 2026 · NASA" data-scene="6">
+    <div class="wrap card">
+      <span class="idx">06 · Earth</span>
+      <h2>Earth is the original bounded system.</h2>
+      <p>Seen from the Moon, the planet is closed to matter and open to sunlight. Its element cycles have kept life running for billions of years. <b>They are the reference design for every smaller system I study.</b></p>
+    </div>
+  </section>
+</div>
+
+<div class="solid">
+  <section class="pivot" id="work">
+    <div class="wrap">
+      <span class="mono">My work</span>
+      <p class="big" style="margin-top:18px">One model, fitted where data are rich, <em>carried to where they are scarce.</em></p>
+      <div class="two" style="margin-top:clamp(32px,5vw,56px)">
+        <p class="prose">Islands are data-rich. Satellites, stream gauges and ocean monitoring programs have watched Hawaiʻi for decades. Sealed systems are data-poor, and small errors in their element budgets compound fast.</p>
+        <p class="prose">My dissertation builds a hierarchical Bayesian state-space model for bounded biogeochemical systems. I test it on nutrient and carbon budgets across the Hawaiian Islands, then apply the fitted structure to bioregenerative life support.</p>
+      </div>
+      <div class="formula" aria-label="Change in stock equals production minus respiration plus boundary inflow minus boundary outflow">
+        dX/dt = P(X, θ) − R(X, θ) + <span class="m">Φ<sub>in</sub></span> − <span class="m">Φ<sub>out</sub></span>
+      </div>
+      <div class="legend">
+        <p><b>X</b>Stocks of carbon, nitrogen and phosphorus inside the boundary.</p>
+        <p><b>P, R</b>Production and respiration by the living community.</p>
+        <p><b>Φ</b>Flows across the boundary: groundwater, runoff, upwelling, dust. Large for an island, near zero for a sealed habitat.</p>
+      </div>
+      <ol class="phases">
+        <li><span class="n">PHASE 1</span><h3>Foundations</h3><p>Define a bounded system, and when two systems share one model.</p></li>
+        <li><span class="n">PHASE 2</span><h3>Inference</h3><p>Fuse data sources and carry uncertainty through every estimate.</p></li>
+        <li><span class="n">PHASE 3</span><h3>Hawaiʻi</h3><p>Fit the model to satellite and public federal data across the islands.</p></li>
+        <li><span class="n">PHASE 4</span><h3>Closed systems</h3><p>Apply the result to closed-system design and check it against chamber studies.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="now">
+    <div class="wrap two">
+      <div>
+        <h2>Now</h2>
+        <p class="mono" style="margin-top:12px">September 2026</p>
+      </div>
+      <ul class="now">
+        <li><span class="mono">Starting</span><div><b>PhD at Oregon State</b><p>Fall term begins 23 September, in the College of Earth, Ocean, and Atmospheric Sciences, with Dr. Carolyn Fonyo.</p></div></li>
+        <li><span class="mono">Writing</span><div><b>A methods paper</b><p>Bayesian mass-balance models tested on simulated natural and engineered systems.</p></div></li>
+        <li><span class="mono">Presenting</span><div><b>AGU26, San Francisco</b><p>7 to 11 December. First public run of the framework.</p></div></li>
+        <li><span class="mono">Teaching</span><div><b>MATH 301 at Unity</b><p>Statistical Modeling for Life and Environmental Sciences, online, in R.</p></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="papers">
+    <div class="wrap two">
+      <div><h2>Papers and talks</h2><p class="mono" style="margin-top:12px">Preprints and code linked on release</p></div>
+      <ul class="list">
+        <li><span><span class="tag in">Submitted</span></span><div><div class="t">Bounded Biogeochemical Systems: A Hierarchical Bayesian Framework from the Hawaiian Archipelago to Bioregenerative Life Support</div><div class="s">AGU26 Annual Meeting abstract</div></div></li>
+        <li><span><span class="tag hot">In preparation</span></span><div><div class="t">Hierarchical Bayesian Mass-Balance and Stoichiometric Identification for Bounded Biogeochemical Systems: A Computational Validation Across Natural and Engineered Domains</div><div class="s">Souza, C.</div></div></li>
+        <li><span><span class="tag">Planned</span></span><div><div class="t">Boundary fluxes across the Hawaiian Islands</div><div class="s">Dissertation chapter</div></div></li>
+      </ul>
+    </div>
+  </section>
+
+  <section id="me">
+    <div class="wrap two">
+      <div>
+        <h2>About me</h2>
+        <ol class="path">
+          <li><time>2022</time><b>Coral Restoration Foundation</b><p>Marine scientist, Florida Keys</p></li>
+          <li><time>2022 to 2023</time><b>Center for Marine Debris Research</b><p>Project coordinator and data analyst, Oʻahu</p></li>
+          <li><time>2024</time><b>Founded Terra Laboratories</b><p>San Diego</p></li>
+          <li class="on"><time>2026</time><b>PhD, Oregon State University</b><p>Environmental Sciences, Quantitative Analysis</p></li>
+        </ol>
+      </div>
+      <div>
+        <div class="prose">
+          <p>I grew up on the water side of science. I studied marine biology and sustainable aquaculture at Unity College, worked reef restoration in the Keys, and cleaned up marine debris data on Oʻahu.</p>
+          <p>The fieldwork kept sending me back to the numbers, so I earned an M.A. in data science at Harvard. Now I build models, teach statistics online at Unity Environmental University, and run Terra Laboratories in San Diego.</p>
+          <p>When I'm not at a keyboard I'm usually on a boat, under one, or on a board.</p>
+        </div>
+        <div class="facts">
+          <span>USCG 100-ton Master</span><span>AAUS Scientific Diver</span><span>PADI Rescue Diver</span><span>Surfing</span><span>Sailing</span><span>Whitewater kayaking</span><span>Climbing</span><span>Skiing</span>
+        </div>
+      </div>
+    </div>
+    <div class="wrap">
+      <div class="places">
+        <figure><img src="assets/img/san-diego.jpg" alt="San Diego Bay from the International Space Station" loading="lazy"><figcaption><b>San Diego</b><span>Home water</span></figcaption></figure>
+        <figure><img src="assets/img/archipelago.jpg" alt="The Hawaiian Islands chain from the Space Shuttle" loading="lazy"><figcaption><b>Hawaiian Islands</b><span>Study system</span></figcaption></figure>
+        <figure><img src="assets/img/mount-hood.jpg" alt="Mount Hood in the Oregon Cascades from the International Space Station" loading="lazy"><figcaption><b>Oregon</b><span>Oregon State, Corvallis</span></figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="wrap">
+      <p class="big">Working on element cycles, islands, or closed systems?</p>
+      <a class="mail" href="mailto:souzacam@oregonstate.edu">souzacam@oregonstate.edu</a>
+      <div class="links">
+        <a href="https://github.com/CamSouza13" rel="noopener">GitHub</a>
+        <a href="https://terralaboratories.com" rel="noopener">Terra Laboratories</a>
+        <a href="mailto:cameron@terralaboratories.com">Company email</a>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span class="mono">© 2026 Cameron Souza</span>
+    <p>Photographs courtesy of NASA (public domain): Hawaiian Islands, STS-51G, 1985 and STS-26, 1988; Hawaiʻi Island, ISS Expedition 72, 2024; Society Islands, STS-93, 1999; Biomass Production Chamber, Kennedy Space Center, 1991; Veggie PONDS, ISS Expedition 62, 2020; North Atlantic phytoplankton bloom, MODIS, NASA Goddard, 2013; Earthset, Artemis II, 2026; San Diego, ISS Expedition 63, 2020; Mount Hood, ISS Expedition 20, 2009. NASA does not endorse this site. The boundary animation is illustrative.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  "use strict";
+  var reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var scenes = [].slice.call(document.querySelectorAll(".scene"));
+  var chapters = [].slice.call(document.querySelectorAll(".ch"));
+  var hud = document.getElementById("hud"), hudVal = document.getElementById("hudVal"),
+      hudBar = document.getElementById("hudBar"), hudCredit = document.getElementById("hudCredit");
+  var solid = document.querySelector(".solid");
+  var K = 0.85, Ktarget = 0.85;
+
+  function activate(ch){
+    var i = +ch.dataset.scene;
+    scenes.forEach(function(s){ s.classList.toggle("on", +s.dataset.scene === i); });
+    Ktarget = +ch.dataset.k;
+    hudVal.textContent = ch.dataset.val;
+    hudCredit.textContent = ch.dataset.credit;
+    hudBar.style.width = Math.max(2, Ktarget * 100) + "%";
+  }
+  if ("IntersectionObserver" in window){
+    var io = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) activate(e.target); });
+    }, {rootMargin:"-45% 0px -45% 0px"});
+    chapters.forEach(function(c){ io.observe(c); });
+    new IntersectionObserver(function(es){
+      es.forEach(function(e){ hud.classList.toggle("off", e.isIntersecting); running = !e.isIntersecting || e.boundingClientRect.top > 0; });
+    }, {rootMargin:"0px 0px -60% 0px"}).observe(solid);
+  }
+  activate(chapters[0]);
+  var nav = document.getElementById("nav");
+  function onScroll(){ nav.classList.toggle("solidnav", solid.getBoundingClientRect().top < 64); }
+  addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+  /* boundary ring */
+  var c = document.getElementById("ring"), x = c.getContext("2d"), W, H, D, P = [], running = true;
+  function size(){
+    var r = c.getBoundingClientRect(); D = Math.min(devicePixelRatio || 1, 2);
+    W = r.width; H = r.height; c.width = Math.round(W*D); c.height = Math.round(H*D); x.setTransform(D,0,0,D,0,0);
+    var n = Math.round(Math.min(220, W*H/7000)); P = [];
+    for (var i=0;i<n;i++) P.push(spawn(Math.random() < .45));
+  }
+  function geom(){
+    var narrow = W < 820;
+    return {cx: narrow ? W*.62 : W*.7, cy: narrow ? H*.62 : H*.46, r: Math.min(W,H) * (narrow ? .28 : .24)};
+  }
+  function spawn(inside){
+    var g = geom(), a = Math.random()*6.283, rr = inside ? Math.sqrt(Math.random())*g.r*.92 : g.r*(1.15+Math.random()*1.6);
+    return {x:g.cx+Math.cos(a)*rr, y:g.cy+Math.sin(a)*rr, vx:(Math.random()-.5)*.6, vy:(Math.random()-.5)*.6, flash:0, s:.7+Math.random()*1.3};
+  }
+  function step(dt){
+    var g = geom();
+    for (var i=0;i<P.length;i++){
+      var p = P[i];
+      p.vx += (Math.random()-.5)*.12; p.vy += (Math.random()-.5)*.12;
+      var v = Math.hypot(p.vx,p.vy); if (v > .9){ p.vx *= .9/v; p.vy *= .9/v; }
+      var nx = p.x + p.vx*dt, ny = p.y + p.vy*dt;
+      var d0 = Math.hypot(p.x-g.cx,p.y-g.cy), d1 = Math.hypot(nx-g.cx,ny-g.cy);
+      if ((d0 < g.r) !== (d1 < g.r)){
+        if (Math.random() < K*.5){ p.flash = 1; }
+        else { var ux=(p.x-g.cx)/(d0||1), uy=(p.y-g.cy)/(d0||1), dot=p.vx*ux+p.vy*uy; p.vx-=2*dot*ux; p.vy-=2*dot*uy; nx=p.x; ny=p.y; }
+      }
+      if (d1 > g.r*3.2){ P[i] = spawn(false); continue; }
+      p.x = nx; p.y = ny;
+      if (p.flash > 0) p.flash -= .02*dt;
+    }
+  }
+  function draw(t){
+    var g = geom();
+    x.clearRect(0,0,W,H);
+    var gap = 1.5 + K*16;
+    x.save();
+    x.setLineDash([Math.max(1.5, 18-gap), gap]); x.lineDashOffset = -t*.008;
+    x.strokeStyle = "rgba(238,241,242,.75)"; x.lineWidth = 1.4;
+    x.beginPath(); x.arc(g.cx,g.cy,g.r,0,6.283); x.stroke();
+    x.restore();
+    x.strokeStyle = "rgba(238,241,242,.12)"; x.lineWidth = 1;
+    x.beginPath(); x.moveTo(g.cx - g.r*1.35, g.cy); x.lineTo(g.cx + g.r*1.35, g.cy); x.moveTo(g.cx, g.cy - g.r*1.35); x.lineTo(g.cx, g.cy + g.r*1.35); x.stroke();
+    for (var i=0;i<P.length;i++){
+      var p = P[i], inside = Math.hypot(p.x-g.cx,p.y-g.cy) < g.r;
+      if (p.flash > 0){ x.fillStyle = "rgba(234,90,164,"+(.5+p.flash*.5)+")"; x.beginPath(); x.arc(p.x,p.y,p.s+p.flash*2.2,0,6.283); x.fill(); continue; }
+      x.fillStyle = inside ? "rgba(238,241,242,.85)" : "rgba(238,241,242,.28)";
+      x.beginPath(); x.arc(p.x,p.y,p.s,0,6.283); x.fill();
+    }
+  }
+  size();
+  var last = performance.now();
+  function frame(t){
+    var dt = Math.min(3,(t-last)/16.67); last = t;
+    K += (Ktarget - K) * .04 * dt;
+    if (running){ step(dt); draw(t); }
+    requestAnimationFrame(frame);
+  }
+  if (reduce){ K = Ktarget; draw(0); }
+  else requestAnimationFrame(frame);
+  var rt; addEventListener("resize", function(){ clearTimeout(rt); rt = setTimeout(function(){ size(); draw(0); }, 150); });
+})();
+</script>
+</body>
+</html>
